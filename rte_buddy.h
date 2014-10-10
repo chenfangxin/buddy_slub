@@ -147,10 +147,11 @@ static inline int compound_order(struct rte_page *page)
 	return (unsigned long)page[1].lru.prev;
 }
 
-int rte_buddy_system_init(struct rte_mem_zone *zone, int node_id, unsigned long start_addr, 
+int rte_buddy_system_init(struct rte_mem_zone *zone, unsigned long start_addr, 
 						  struct rte_page *start_page, unsigned long page_size, unsigned long page_num);
-struct rte_page *rte_get_pages(unsigned int order, int node_id);
-void rte_free_pages(struct rte_page *page, int node_id);
-void *rte_page_to_virt(struct rte_page *page, int node_id);
+struct rte_page *rte_get_pages(unsigned int order);
+void rte_free_pages(struct rte_page *page);
+void *rte_page_to_virt(struct rte_page *page);
 
 #endif
+
