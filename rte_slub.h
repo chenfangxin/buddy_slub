@@ -43,9 +43,17 @@ static inline void RTE_SLUB_BUG(const char *name, int line)
 	assert(0);
 }
 
+static inline unsigned int rte_fls(unsigned int x)
+{
+	asm("bsr %1,%0"
+	    : "=r" (x)
+	    : "rm" (x));
+	return x;
+}
+
+
 int rte_slub_system_init(struct rte_mem_cache *array, int cache_num);
 void * __rte_slub_alloc(uint32_t size);
 void __rte_slub_free(void *ptr);
-
 
 #endif

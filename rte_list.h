@@ -1,6 +1,9 @@
 #ifndef __RTE_LIST_H__
 #define __RTE_LIST_H__
 
+#define likely(x) __builtin_expect(!!(x), 1)
+#define unlikely(x) __builtin_expect(!!(x), 0)
+
 static inline void prefetch(const void *addr)
 {
 	__asm__ __volatile__(
