@@ -25,6 +25,7 @@ struct mem_cache_node{
 
 #define RTE_MAX_CPU_NUM 8
 
+/* 每种规格的slab都对应一个 struct rte_mem_caches 结构体 */
 struct rte_mem_cache{
 	struct mem_cache_cpu cpu_slab[RTE_MAX_CPU_NUM];
 	int32_t size; 

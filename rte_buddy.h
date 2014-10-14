@@ -71,7 +71,7 @@ static inline void RTE_BUDDY_BUG(char *f, int line)
 
 /*
  * 页分为两类：一类是单页（zero page）,一类是组合页（compound page）
- *
+ * 页所处的状态分为：1 在Buddy系统中， 2 在Slub系统中
  * */
 static inline void __SetPageHead(struct rte_page *page)
 {

@@ -57,16 +57,17 @@ static inline void set_compound_order(struct rte_page *page, unsigned int order)
 	page[1].lru.prev = (void *)((unsigned long)order);
 }
 
+/* 设置组合页的属性 */
 static void prepare_compound_page(struct rte_page *page, unsigned int order)
 {
 	unsigned int i;
 	unsigned int nr_pages = (1<<order);
 
-	set_compound_order(page, order);
-	__SetPageHead(page);
+	set_compound_order(page, order); // 标记页的大小(order值)
+	__SetPageHead(page); // 首页设置head标志
 	for(i=1; i<nr_pages; i++){
 		struct rte_page *p = page + i;
-		__SetPageTail(p);
+		__SetPageTail(p); // 其余页设置tail标志
 		p->first_page = page;
 	}
 }
@@ -88,6 +89,14 @@ static int destroy_compound_page(struct rte_page *page, unsigned int order)
 	return bad;
 
 }
+
+/*
+ * expand函数用于将组合页进行分裂，以获得所需要大小的页
+ * 参数：
+ * 	page: 指向组合页首页的描述符。组合页可视为页的数组
+ *	low: 目标页的大小(order值)
+ *	high: 要分裂的组合页的大小(order值)
+ * */
 static inline void expand(struct rte_mem_zone *zone, struct rte_page *page,
 				unsigned int low, unsigned int high, struct free_area *area)
 {

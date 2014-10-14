@@ -90,6 +90,7 @@ static struct rte_mem_cache *get_slab(uint32_t size)
 {
 	struct rte_mem_cache *s;	
 	int index=0;
+
 	if(size<=RTE_SLAB_BASE_SIZE){
 		index = 0;
 	}else{
@@ -290,17 +291,17 @@ static void *slab_alloc(struct rte_mem_cache *s)
 void *__rte_slub_alloc(uint32_t size)
 {
 	struct rte_mem_cache *s;	
-	void *ret;
+	void *ptr;
 
 	s = get_slab(size);
 	if(unlikely(NULL==s)){
 		return NULL;
 	}
-	ret = slab_alloc(s);
-	if(NULL!=ret){
+	ptr = slab_alloc(s);
+	if(NULL!=ptr){
 		s->alloc_cnt++;	
 	}
-	return ret;
+	return ptr;
 }
 
 static void remove_partial(struct rte_mem_cache *s, struct rte_page *page)
