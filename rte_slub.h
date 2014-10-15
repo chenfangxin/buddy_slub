@@ -27,7 +27,7 @@ struct mem_cache_node{
 
 /* 每种规格的slab都对应一个 struct rte_mem_caches 结构体 */
 struct rte_mem_cache{
-	struct mem_cache_cpu cpu_slab[RTE_MAX_CPU_NUM];
+	struct mem_cache_cpu cpu_slab[RTE_MAX_CPU_NUM]; // 每个Core对应一个
 	int32_t size; 
 	int32_t offset; 
 	int32_t objsize; 

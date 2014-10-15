@@ -4,13 +4,16 @@
 
 static struct rte_mem_cache *global_mem_caches;
 
+/* 返回所在Core的序号。用于访问slub系统中为每个Core都准备的本地缓存 */
 static inline int rte_get_self_id(void)
 {
 	return 0;
 }
 
-static inline struct mem_cache_cpu *get_cpu_slab(struct rte_mem_cache *s, int id)
+static inline struct mem_cache_cpu *get_cpu_slab(struct rte_mem_cache *s)
 {
+	int id = rte_get_self_id();
+
 	return &(s->cpu_slab[id]);
 }
 
@@ -260,7 +263,7 @@ new_slab:
 
 	new = new_slab(s);
 	if(new){
-		c = get_cpu_slab(s, rte_get_self_id());
+		c = get_cpu_slab(s);
 		if(c->page){ // 
 			flush_slab(s, c);
 		}
@@ -277,12 +280,12 @@ static void *slab_alloc(struct rte_mem_cache *s)
 	void **object;		
 	struct mem_cache_cpu *c;
 
-	c = get_cpu_slab(s, rte_get_self_id());
+	c = get_cpu_slab(s);
 	object = c->freelist;
-	if(unlikely(NULL==object)){//当前Local slab中没有空闲Obj
+	if(unlikely(NULL==object)){//当前Core的Freelist中没有空闲Obj
 		object = __slab_alloc(s, c);
 	}else{
-		c->freelist = get_freepointer(s, object); 
+		c->freelist = get_freepointer(s, object); // 有空闲Obj时，直接分一个
 	}
 
 	return object;
@@ -413,8 +416,8 @@ static void slab_free(struct rte_mem_cache *s, struct rte_page *page, void *p)
 	void **object = (void *)p;
 	struct mem_cache_cpu *c;
 
-	c = get_cpu_slab(s, rte_get_self_id());
-	if(likely(page==c->page)){
+	c = get_cpu_slab(s);
+	if(likely(page==c->page)){ // 当页正作为Local slab时
 		set_freepointer(s, object, c->freelist);
 		c->freelist = object;
 	}else{
@@ -433,7 +436,7 @@ void  __rte_slub_free(void *ptr)
 		return;
 	}
 
-	page = rte_virt_to_head_page(ptr);
+	page = rte_virt_to_head_page(ptr); // 获得要释放的内存Obj所在的页
 	if(unlikely(!PageSlub(page))){
 		RTE_SLUB_BUG(__FILE__, __LINE__);		
 		return;
