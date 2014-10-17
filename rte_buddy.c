@@ -30,10 +30,9 @@ static inline uint32_t page_order(struct rte_page *page)
 	return page_private(page);
 }
 
-static inline struct rte_page *__page_find_buddy(struct rte_page *page, uint32_t page_idx, uint32_t order)
+static inline uint32_t __find_buddy_index(uint32_t page_idx, uint32_t order)
 {
-	uint32_t buddy_idx = page_idx ^(1<<order);
-	return page + (int)(buddy_idx - page_idx);
+	return page_idx ^(1<<order);
 }
 
 static inline int page_is_buddy(struct rte_page *page, struct rte_page *buddy, int order)
@@ -156,6 +155,7 @@ void rte_free_pages(struct rte_page *page)
 {
 	struct rte_mem_zone *zone = global_mem_zone;	
 	uint32_t page_idx = (page - zone->first_page);
+	uint32_t buddy_idx = 0;
 	uint32_t order = compound_order(page);
 
 	rte_spinlock_lock(&zone->lock);
@@ -169,7 +169,8 @@ void rte_free_pages(struct rte_page *page)
 	while(order<RTE_MAX_ORDER-1){
 		uint32_t combinded_idx;
 		struct rte_page *buddy;
-		buddy = __page_find_buddy(page, page_idx, order);
+		buddy_idx = __find_buddy_index(page_idx, order);
+		buddy = page + (int32_t)(buddy_idx - page_idx);
 		if(!page_is_buddy(page, buddy, order)){
 			break;
 		}
@@ -177,7 +178,7 @@ void rte_free_pages(struct rte_page *page)
 		zone->free_area[order].nr_free--;
 		rmv_page_order(buddy);
 		combinded_idx = __find_combined_index(page_idx, order);
-		page = page + (int)(combinded_idx - page_idx);
+		page = page + (int32_t)(combinded_idx - page_idx);
 		page_idx = combinded_idx;
 		order++;
 	}
