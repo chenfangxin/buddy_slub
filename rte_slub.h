@@ -19,7 +19,6 @@ struct mem_cache_node{
 
 #define RTE_SLAB_BASE_SIZE 64
 #define RTE_SHM_CACHE_NUM 14
-#define RTE_LOCAL_CACHE_NUM 14 //Max 512K
 #define RTE_OO_SHIFT 16
 #define RTE_OO_MASK ((1UL<<RTE_OO_SHIFT)-1)
 
@@ -31,7 +30,7 @@ struct rte_mem_cache{
 	int32_t size; 
 	int32_t offset; 
 	int32_t objsize; 
-	uint64_t oo;
+	uint64_t oo; // order | 
 	struct mem_cache_node local_node;
 	uint64_t min_partial;
 	uint64_t alloc_cnt;

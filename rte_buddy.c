@@ -33,7 +33,7 @@ static inline uint32_t page_order(struct rte_page *page)
 static inline struct rte_page *__page_find_buddy(struct rte_page *page, uint32_t page_idx, uint32_t order)
 {
 	uint32_t buddy_idx = page_idx ^(1<<order);
-	return page + (buddy_idx - page_idx);
+	return page + (int)(buddy_idx - page_idx);
 }
 
 static inline int page_is_buddy(struct rte_page *page, struct rte_page *buddy, int order)
@@ -177,7 +177,7 @@ void rte_free_pages(struct rte_page *page)
 		zone->free_area[order].nr_free--;
 		rmv_page_order(buddy);
 		combinded_idx = __find_combined_index(page_idx, order);
-		page = page + (combinded_idx - page_idx);
+		page = page + (int)(combinded_idx - page_idx);
 		page_idx = combinded_idx;
 		order++;
 	}
@@ -189,8 +189,17 @@ void rte_free_pages(struct rte_page *page)
 	return;
 }
 
+/*
+ * 初始化Buddy系统
+ * 参数
+ *    zone:
+ *    start_addr:
+ *    start_page:
+ *    page_size:
+ *    page_num:
+ **/
 int rte_buddy_system_init(struct rte_mem_zone *zone, unsigned long start_addr, 
-						  struct rte_page *start_page, unsigned int page_size, unsigned int page_num)
+						  struct rte_page *start_page, unsigned int page_num)
 {
 	struct rte_page *page=NULL;
 	unsigned int i;
@@ -206,10 +215,10 @@ int rte_buddy_system_init(struct rte_mem_zone *zone, unsigned long start_addr,
 		area->nr_free = 0;
 	}
 	zone->page_num = page_num;
-	zone->page_size = page_size;
+	zone->page_size = RTE_PAGE_SIZE;
 	zone->first_page = start_page;
 	zone->start_addr = start_addr;
-	zone->end_addr = zone->start_addr + (page_num * page_size);
+	zone->end_addr = zone->start_addr + (page_num * RTE_PAGE_SIZE);
 
 	for(i=0; i<page_num; i++){
 		page = zone->first_page + i;

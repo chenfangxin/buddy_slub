@@ -7,11 +7,10 @@
 #define RTE_MAX_ORDER 7U // Max (1<<RTE_MAX_ORDER)MB
 
 /* 
- * The shared memory is based on Hugetlbpage, 
- * the size of hugetlbpage is 2M 
+ * The shared memory is based on Hugetlbpage, the size of hugetlbpage is 2M 
  * */
-#define RTE_PAGE_SHIFT	21U 
-#define RTE_PAGE_SIZE 	2097152U	// 2M
+#define RTE_PAGE_SIZE 	0x1000U	// Buddy系统中每页的大小
+#define RTE_PAGE_SHIFT	12U  // 与上面的RTE_PAGE_SIZE对应 
 
 /*
  * 标记Page所处的状态
@@ -161,7 +160,7 @@ static inline int compound_order(struct rte_page *page)
 }
 
 int rte_buddy_system_init(struct rte_mem_zone *zone, unsigned long start_addr, 
-						  struct rte_page *start_page, unsigned int page_size, unsigned int page_num);
+						  struct rte_page *start_page, unsigned int page_num);
 struct rte_page *rte_get_pages(unsigned int order);
 void rte_free_pages(struct rte_page *page);
 void *rte_page_to_virt(struct rte_page *page);
