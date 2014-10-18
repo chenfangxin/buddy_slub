@@ -32,8 +32,6 @@ struct rte_mem_cache{
 	uint64_t oo; // oo = order<<OO_SHIFT |slab_num,（在内核中存在slab大于页的情况，本例中没有, 所以order设为0）
 	struct mem_cache_node local_node;
 	uint64_t min_partial;
-	uint64_t alloc_cnt;
-	uint64_t free_cnt;
 };
 
 static inline void RTE_SLUB_BUG(const char *name, int line)

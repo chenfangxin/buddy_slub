@@ -87,6 +87,7 @@ int main(void)
 		printf("Failed to malloc.\n");
 	}
 	printf("ptr = %p\n", ptr);	
+
 	rte_free(ptr);
 
 	return 0;

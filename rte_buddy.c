@@ -30,7 +30,7 @@ static inline uint32_t page_order(struct rte_page *page)
 	return page_private(page);
 }
 
-static inline uint32_t __find_buddy_index(uint32_t page_idx, uint32_t order)
+static inline uint64_t __find_buddy_index(uint64_t page_idx, uint64_t order)
 {
 	return page_idx ^(1<<order);
 }
@@ -46,7 +46,7 @@ static inline int page_is_buddy(struct rte_page *page, struct rte_page *buddy, i
 	return 0;
 }
 
-static inline uint32_t __find_combined_index(uint32_t page_idx, uint32_t order)
+static inline uint64_t __find_combined_index(uint64_t page_idx, uint64_t order)
 {
 	return (page_idx &~(1U<<order));
 }
@@ -154,8 +154,8 @@ struct rte_page *rte_get_pages(unsigned int order)
 void rte_free_pages(struct rte_page *page)
 {
 	struct rte_mem_zone *zone = global_mem_zone;	
-	uint32_t page_idx = (page - zone->first_page);
-	uint32_t buddy_idx = 0;
+	uint64_t page_idx = (page - zone->first_page);
+	uint64_t buddy_idx = 0;
 	uint32_t order = compound_order(page);
 
 	rte_spinlock_lock(&zone->lock);
@@ -167,10 +167,10 @@ void rte_free_pages(struct rte_page *page)
 
 	zone->free_zero_num += (1<<order);	
 	while(order<RTE_MAX_ORDER-1){
-		uint32_t combinded_idx;
+		uint64_t combinded_idx;
 		struct rte_page *buddy;
 		buddy_idx = __find_buddy_index(page_idx, order);
-		buddy = page + (int32_t)(buddy_idx - page_idx);
+		buddy = page + (buddy_idx - page_idx); /* buddy_idx=0, page_idx=1时,为什么没有出问题？若XXX_idx定义为uint32_t时呢？*/
 		if(!page_is_buddy(page, buddy, order)){
 			break;
 		}
@@ -178,7 +178,7 @@ void rte_free_pages(struct rte_page *page)
 		zone->free_area[order].nr_free--;
 		rmv_page_order(buddy);
 		combinded_idx = __find_combined_index(page_idx, order);
-		page = page + (int32_t)(combinded_idx - page_idx);
+		page = page + (combinded_idx - page_idx);
 		page_idx = combinded_idx;
 		order++;
 	}
@@ -234,7 +234,7 @@ int rte_buddy_system_init(struct rte_mem_zone *zone, unsigned long start_addr,
 
 void *rte_page_to_virt(struct rte_page *page)
 {
-	uint32_t page_idx=0;
+	uint64_t page_idx=0;
 	uint64_t address=0;
 	struct rte_mem_zone *zone=global_mem_zone;
 
@@ -246,7 +246,7 @@ void *rte_page_to_virt(struct rte_page *page)
 
 struct rte_page *rte_virt_to_page(void *ptr)
 {
-	uint32_t page_idx=0;
+	uint64_t page_idx=0;
 	struct rte_mem_zone *zone=global_mem_zone;
 	struct rte_page *page=NULL;
 	uint64_t address=(uint64_t)ptr;

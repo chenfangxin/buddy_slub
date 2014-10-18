@@ -301,9 +301,7 @@ void *__rte_slub_alloc(uint32_t size)
 		return NULL;
 	}
 	ptr = slab_alloc(s);
-	if(NULL!=ptr){
-		s->alloc_cnt++;	
-	}
+
 	return ptr;
 }
 
@@ -423,7 +421,6 @@ static void slab_free(struct rte_mem_cache *s, struct rte_page *page, void *p)
 	}else{
 		__slab_free(s, page, p);
 	}
-	s->free_cnt++;
 	return ;
 }
 
