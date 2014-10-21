@@ -18,8 +18,7 @@ static inline struct mem_cache_cpu *get_cpu_slab(struct rte_mem_cache *s)
 }
 
 #define for_each_object(__p, __s, __addr, __objects) \
-		for(__p=(__addr);__p<(__addr)+(__objects)*(__s)->size;\
-						__p += (__s)->size)
+	for(__p=(__addr);__p<(__addr)+(__objects)*(__s)->size;__p += (__s)->size)
 
 static inline void set_freepointer(struct rte_mem_cache *s, void *object, void *fp)
 {
