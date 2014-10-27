@@ -20,7 +20,7 @@ static inline void __rte_spinlock_lock__(rte_spinlock_t *sl)
 			"jz 3f\n"
 			"2:\n"
 			"pause\n"
-			"cmp $0, %[value]\n"
+			"cmpl $0, %[value]\n"
 			"jnz 2b\n"
 			"jmp 1b\n"
 			"3:\n"
