@@ -30,6 +30,19 @@ static inline void *get_freepointer(struct rte_mem_cache *s, void *object)
 	return *(void **)(object + s->offset);
 }
 
+static inline int rte_calc_order(int size)
+{
+	int order;
+	size = (size-1)>>(RTE_PAGE_SHIFT-1);	
+	order = -1;
+	do{
+		size >>= 1;
+		order++;
+	}while(size);
+
+	return order;
+}
+
 static inline unsigned long rte_oo_make(int order, unsigned long size)
 {
 	unsigned long x = {(order<<RTE_OO_SHIFT) + (RTE_PAGE_SIZE<<order)/size};
@@ -342,9 +355,11 @@ static void set_min_partial(struct rte_mem_cache *s, unsigned long min)
 static int init_mem_cache(struct rte_mem_cache *s, int size)
 {
 	int i;
+	int order;
+	order = rte_calc_order(size);
 	s->size = size;
 	s->offset = RTE_SLUB_OFFSET;
-	s->oo = rte_oo_make(0, size);
+	s->oo = rte_oo_make(order, size);
 
 	set_min_partial(s, 5);
 	init_mem_cache_node(&s->local_node);

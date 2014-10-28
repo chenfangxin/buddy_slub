@@ -29,7 +29,7 @@ struct rte_mem_cache{
 	struct mem_cache_cpu cpu_slab[RTE_MAX_CPU_NUM]; // 每个Core对应一个
 	int32_t size; // 本mem_cache中slab的规格
 	int32_t offset; // 页中的空闲slab组成一个链表，在slab中便宜量为offset的地方中存放下一个slab的地址
-	uint64_t oo; // oo = order<<OO_SHIFT |slab_num,（在内核中存在slab大于页的情况，本例中没有, 所以order设为0）
+	uint64_t oo; // oo = order<<OO_SHIFT |slab_num（存在slab占用多个页的情况）
 	struct mem_cache_node local_node;
 	uint64_t min_partial;
 };
@@ -40,6 +40,7 @@ static inline void RTE_SLUB_BUG(const char *name, int line)
 	assert(0);
 }
 
+/* Only for x86_64, from arch/x86/include/asm/bitops.h */
 static inline unsigned int rte_fls(unsigned int x)
 {
 	asm("bsr %1,%0"

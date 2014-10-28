@@ -4,11 +4,7 @@
 #include "rte_list.h"
 #include "rte_spinlock.h"
 
-#define RTE_MAX_ORDER 7U // Max (1<<RTE_MAX_ORDER)MB
-
-/* 
- * The shared memory is based on Hugetlbpage, the size of hugetlbpage is 2M 
- * */
+#define RTE_MAX_ORDER 7U // Max = (1<<order)*PAGE_SIZE
 #define RTE_PAGE_SIZE 	0x1000U	// Buddy系统中每页的大小
 #define RTE_PAGE_SHIFT	12U  // 与上面的RTE_PAGE_SIZE对应 
 

@@ -35,6 +35,9 @@ static inline uint64_t __find_buddy_index(uint64_t page_idx, uint64_t order)
 	return page_idx ^(1<<order);
 }
 
+/* 
+ * 判断page页对应的buddy页是否在于Buddy系统中
+ * */
 static inline int page_is_buddy(struct rte_page *page, struct rte_page *buddy, int order)
 {
 	if(page_zone_id(page)!=page_zone_id(buddy)){

@@ -82,7 +82,7 @@ int main(void)
 	if(ret<0){
 		return -1;
 	}
-	ptr = rte_malloc(24);
+	ptr = rte_malloc(65535);
 	if(NULL==ptr){
 		printf("Failed to malloc.\n");
 	}

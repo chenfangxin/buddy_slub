@@ -6,5 +6,6 @@ slub防止内存的“内碎片”，即尽量按请求的大小分配内存块�
 
 执行方式：
 echo 3 > /proc/sys/vm/nr_hugepages
+cat /proc/meminfo | grep Huge
 ./root
 
