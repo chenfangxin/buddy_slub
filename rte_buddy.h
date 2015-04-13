@@ -70,12 +70,12 @@ static inline void RTE_BUDDY_BUG(char *f, int line)
  * */
 static inline void __SetPageHead(struct rte_page *page)
 {
-	page->flags |= PG_head;		
+	page->flags |= (1UL<<PG_head);		
 }
 
 static inline void __SetPageTail(struct rte_page *page)
 {
-	page->flags |= PG_tail;
+	page->flags |= (1UL<<PG_tail);
 }
 
 static inline void __SetPageBuddy(struct rte_page *page)
